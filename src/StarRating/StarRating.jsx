@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
+
 const containerStyle = {
   display: "flex",
   alignItems: "center",
@@ -10,9 +12,22 @@ const starContainerStyle = {
   gap: "4px",
 };
 
-const StarRating = ({ maxRating = 5, color = "#fcc419", size = 48 }) => {
-  const [rating, setRating] = useState(0);
+const StarRating = ({
+  maxRating = 5,
+  color = "#fcc419",
+  size = 48,
+  className = "test",
+  message = [],
+  defaultRating = 0,
+  onSetRating,
+}) => {
+  const [rating, setRating] = useState(defaultRating);
   const [tempRating, setTemprating] = useState(0);
+
+  const handleRating = (rating) => {
+    setRating(rating);
+    onSetRating(rating);
+  };
 
   const textStyle = {
     lineHight: "1",
@@ -22,12 +37,12 @@ const StarRating = ({ maxRating = 5, color = "#fcc419", size = 48 }) => {
   };
 
   return (
-    <div style={containerStyle}>
+    <div style={containerStyle} className={className}>
       <div style={starContainerStyle}>
         {Array.from({ length: maxRating }, (_, i) => (
           <Star
             key={i}
-            onRate={() => setRating(i + 1)}
+            onRate={() => handleRating(i + 1)}
             full={tempRating ? tempRating >= i + 1 : rating >= i + 1}
             onHoverIn={() => setTemprating(i + 1)}
             onHoverOut={() => setTemprating(0)}
@@ -36,16 +51,16 @@ const StarRating = ({ maxRating = 5, color = "#fcc419", size = 48 }) => {
           />
         ))}
       </div>
-      <p style={textStyle}>{tempRating || rating || ""}</p>
+      <p style={textStyle}>
+        {message.length === maxRating
+          ? message[tempRating ? tempRating - 1 : rating - 1]
+          : tempRating || rating || ""}
+      </p>
     </div>
   );
 };
 
 export default StarRating;
-
-const handleRating = (rating) => {
-  setRating(rating);
-};
 
 const Star = ({
   onRate,
@@ -96,6 +111,15 @@ const Star = ({
       )}
     </span>
   );
+};
+
+StarRating.propTypes = {
+  maxRating: PropTypes.number,
+  defaultRating: PropTypes.number,
+  color: PropTypes.string,
+  size: PropTypes.number,
+  onSetRating: PropTypes.func,
+  className: PropTypes.string,
 };
 
 /*
